@@ -1,3 +1,6 @@
+import re
+from urllib.parse import unquote_plus
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -41,10 +44,8 @@ class Sakai:
         get all joined sites
         :return: list of dict {id, name}
         """
-        mp = self.fetch('http://sakai.sustc.edu.cn/portal')
-        with open('t.html', 'wb') as f:
-            f.write(mp.content)
-        soup = BeautifulSoup(mp.content, 'html5lib')
+        resp = self.fetch('http://sakai.sustc.edu.cn/portal')
+        soup = BeautifulSoup(resp.content, 'html5lib')
         sites = list()
 
         for li in soup.find('ul', {'id': 'pda-portlet-site-menu'}).find_all('li')[1:]:
@@ -101,6 +102,42 @@ class Sakai:
             })
         return assignments
 
+    def site_resources_list(self, site_id, tool_id):
+        """
+        get resources list of given site
+        :param site_id: site id
+        :param tool_id: site's resources tool's id
+        :return: list of dict {name, path, url}
+        """
+        resp = self.fetch('http://sakai.sustc.edu.cn/portal/pda/{}/tool/{}'.format(site_id, tool_id))
+        group_id = Site.match_file_group_id(resp.text)
+        base = 'http://sakai.sustc.edu.cn/access/content/group/{}/'.format(group_id)
+
+        resp = self.fetch(base)
+        file_list = list()
+        files, folders = Site.parse_file_and_folder(resp.content)
+        for file in files:
+            file_list.append({
+                'name': unquote_plus(file),
+                'path': unquote_plus(file),
+                'url': base + file
+            })
+        stack = list()
+        stack.extend(reversed(folders))
+        while stack:
+            folder = stack.pop()
+            resp = self.fetch(base + folder)
+            files, folders = Site.parse_file_and_folder(resp.content)
+            for file in files:
+                file_list.append({
+                    'name': unquote_plus(file),
+                    'path': unquote_plus(folder) + unquote_plus(file),
+                    'url': base + folder + file
+                })
+            for new_folder in folders:
+                stack.append(folder + new_folder)
+        return file_list
+
 
 class Site(Sakai):
     """
@@ -121,21 +158,60 @@ class Site(Sakai):
         if prefetch:
             self.tools_list = super().site_tools_list(self._site_id)
 
+    def find_tool_id_by_name(self, name_en, name_zh, raise_exception=True):
+        """
+        find tool's id by their names
+        :param name_en: name in English
+        :param name_zh: name in Chinese
+        :param raise_exception: if raise exception when not found
+        :return: tool's id or None, or raise Exception
+        :raise: NoSuchItem
+        """
+        if not self.tools_list:
+            self.tools_list = super().site_tools_list(self._site_id)
+        for tool in self.tools_list:
+            if tool['name'] == name_en or tool['name'] == name_zh:
+                return tool['id']
+        if raise_exception:
+            raise NoSuchItem('{}/{}'.format(name_en, name_zh))
+        return None
+
     def assignment_list(self):
         """
         get assignment list of this site
         :return: list of dict {title, status, start_date, due_date}
         """
-        if not self.tools_list:
-            self.tools_list = super().site_tools_list(self._site_id)
-        assignment_tool_id = None
-        for tool in self.tools_list:
-            if tool['name'] == 'Assignments':
-                assignment_tool_id = tool['id']
-                break
-        if not assignment_tool_id:
-            raise NoSuchItem('Assignments')
-        return super().site_assignment_list(self._site_id, assignment_tool_id)
+        return super().site_assignment_list(self._site_id, self.find_tool_id_by_name('Assignments', '作业'))
+
+    def resources_list(self):
+        """
+        get resources list of this site
+        :return: tree
+        """
+        return super().site_resources_list(self._site_id, self.find_tool_id_by_name('Resources', '资源'))
+
+    @staticmethod
+    def match_file_group_id(text):
+        """
+        match file group id in page source
+        :param text: page source
+        :return: matched id or None
+        """
+        pattern = '/group/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'
+        matched = re.search(pattern, text)
+        return matched.group(1) if matched else None
+
+    @staticmethod
+    def parse_file_and_folder(content):
+        """
+        parse files and folders in current page
+        :param content: raw content of request
+        :return: ;list of files and list of folders (all relative path, unquoted)
+        """
+        soup = BeautifulSoup(content, 'html5lib')
+        files = [li.a['href'] for li in soup.find_all('li', {'class': 'file'})]
+        folders = [li.a['href'] for li in soup.find_all('li', {'class': 'folder'})]
+        return files, folders
 
     def __repr__(self):
         return '<SakaiSite {}>'.format(self._site_id)
