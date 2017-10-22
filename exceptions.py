@@ -4,3 +4,10 @@ class SakaiException(Exception):
     """
     pass
 
+
+class NotLoggedIn(SakaiException):
+    pass
+
+
+class NoSuchItem(SakaiException):
+    pass

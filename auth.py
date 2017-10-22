@@ -1,7 +1,8 @@
 import requests
-from sakai import Sakai
 from bs4 import BeautifulSoup
+
 from exceptions import SakaiException
+from sakai import Sakai
 
 LOGIN_URL = 'http://sakai.sustc.edu.cn/portal/pda/?force.login=yes'
 
@@ -39,10 +40,14 @@ def cas_login(sid, password):
     if err:
         raise SakaiException('Login failed')
 
-    return session.cookies.get('JSESSIONID',path='/')
+    return session.cookies.get('JSESSIONID', path='/')
 
 
 class SakaiAuth(Sakai):
+    """
+    this class takes username and password for authentication
+    """
+
     def __init__(self, sid, password):
         jsessionid = cas_login(sid, password)
         Sakai.__init__(self, jsessionid)
