@@ -33,11 +33,23 @@ class Sakai:
         self.session.cookies.set(name='JSESSIONID', value=jsessionid)
 
     def fetch(self, url):
+        """
+        get url
+        :param url:
+        :return:
+        """
         resp = self.session.get(url)
         if '"loggedIn": false' in resp.text:
             # TODO: fix this dirty solution
             raise NotLoggedIn
         return resp
+
+    def logout(self):
+        """
+        logout the server
+        :return:
+        """
+        self.session.get('http://sakai.sustc.edu.cn/portal/pda/?force.logout=yes')
 
     def sites_joined(self):
         """
