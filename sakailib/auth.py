@@ -1,8 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
-
 from exceptions import SakaiException
-from sakai import Sakai
+
+from sakailib.sakai import Sakai
 
 LOGIN_URL = 'http://sakai.sustc.edu.cn/portal/pda/?force.login=yes'
 

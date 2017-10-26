@@ -4,7 +4,7 @@ from urllib.parse import unquote_plus
 import requests
 from bs4 import BeautifulSoup
 
-from exceptions import *
+from sakailib.exceptions import *
 
 
 class Sakai:
