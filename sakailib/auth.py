@@ -1,8 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
-from exceptions import SakaiException
 
 from sakailib.sakai import Sakai
+from .exceptions import SakaiException
 
 LOGIN_URL = 'http://sakai.sustc.edu.cn/portal/pda/?force.login=yes'
 
@@ -36,7 +36,7 @@ def cas_login(sid, password):
 
     r = session.post(resp.url, data=info, timeout=30)
     soup_response = BeautifulSoup(r.content, 'html5lib')
-    err = soup_response.find('div', {'class': 'errors', 'id': 'msg'})
+    err = soup_response.find('div', {'class': 'alert'})
     if err:
         raise SakaiException('Login failed')
 

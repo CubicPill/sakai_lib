@@ -4,7 +4,7 @@ from urllib.parse import unquote_plus
 import requests
 from bs4 import BeautifulSoup
 
-from sakailib.exceptions import *
+from .exceptions import *
 
 
 class Sakai:
@@ -107,7 +107,7 @@ class Sakai:
         assignments = list()
         for tr in soup.find('table').find_all('tr')[1:]:
             assignments.append({
-                'title': tr.find('td', {'headers': 'title'}).text.strip(),
+                'title': tr.find('td', {'headers': 'title'}).h4.text.strip(),
                 'status': tr.find('td', {'headers': 'status'}).text.strip(),
                 'start_date': tr.find('td', {'headers': 'openDate'}).text.strip(),
                 'due_date': tr.find('td', {'headers': 'dueDate'}).text.strip()
