@@ -36,7 +36,7 @@ def cas_login(sid, password):
 
     r = session.post(resp.url, data=info, timeout=30)
     soup_response = BeautifulSoup(r.content, 'html5lib')
-    err = soup_response.find('div', {'class': 'alert'})
+    err = soup_response.find('div', {'class': 'alert-danger'})
     if err:
         raise SakaiException('Login failed')
 
