@@ -164,11 +164,11 @@ class Site(Sakai):
         :param prefetch: if fetch tools list on create
         """
         Sakai.__init__(self, jsessionid)
-        self._site_id = site_id
-        self._name = name
+        self.site_id = site_id
+        self.name = name
         self.tools_list = None
         if prefetch:
-            self.tools_list = super().site_tools_list(self._site_id)
+            self.tools_list = super().site_tools_list(self.site_id)
 
     def find_tool_id_by_name(self, name_en, name_zh, raise_exception=True):
         """
@@ -180,7 +180,7 @@ class Site(Sakai):
         :raise: NoSuchItem
         """
         if not self.tools_list:
-            self.tools_list = super().site_tools_list(self._site_id)
+            self.tools_list = super().site_tools_list(self.site_id)
         for tool in self.tools_list:
             if tool['name'] == name_en or tool['name'] == name_zh:
                 return tool['id']
@@ -193,14 +193,14 @@ class Site(Sakai):
         get assignment list of this site
         :return: list of dict {title, status, start_date, due_date}
         """
-        return super().site_assignment_list(self._site_id, self.find_tool_id_by_name('Assignments', '作业'))
+        return super().site_assignment_list(self.site_id, self.find_tool_id_by_name('Assignments', '作业'))
 
     def resources_list(self):
         """
         get resources list of this site
         :return: tree
         """
-        return super().site_resources_list(self._site_id, self.find_tool_id_by_name('Resources', '资源'))
+        return super().site_resources_list(self.site_id, self.find_tool_id_by_name('Resources', '资源'))
 
     @staticmethod
     def match_file_group_id(text):
@@ -226,4 +226,4 @@ class Site(Sakai):
         return files, folders
 
     def __repr__(self):
-        return '<SakaiSite {}>'.format(self._site_id)
+        return '<SakaiSite {}>'.format(self.site_id)
