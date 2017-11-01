@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='sakailib',
-    version='v1.0.1',
+    version='v1.0.2',
     packages=['sakailib'],
     url='https://github.com/cubicpill/sakai_lib',
     license='GPL v3.0',

@@ -48,7 +48,7 @@ def main():
                 if 'Not Started' in s or 'Draft' in s or '进行中' in s or '尚未提交' in s:  # unfinished assignments
                     if st <= nt:  # has started
                         if dt > nt:  # not due
-                            assignments.append([site._name, a['title'], dt])
+                            assignments.append([site.name, a['title'], dt])
         except NoSuchItem:
             pass
     assignments.sort(key=lambda _assignment: _assignment[2])
