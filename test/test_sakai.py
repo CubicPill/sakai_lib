@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from sakailib import SakaiAuth, Sakai
+from sakailib import SakaiAuth, Sakai, Site
 from sakailib.exceptions import NotLoggedIn
 from .test_config import config
 
@@ -10,16 +10,13 @@ sakai_nologin = Sakai('')
 
 class TestSakai(TestCase):
     def test_fetch(self):
-        sakai.fetch('https://sakai.sustc.edu.cn')
+        sakai.fetch('http://sakai.sustc.edu.cn')
 
     def test_fetch_no_login(self):
         try:
-            sakai_nologin.fetch('https://sakai.sustc.edu.cn')
+            sakai_nologin.fetch('http://sakai.sustc.edu.cn')
         except Exception as e:
             self.assertEqual(type(e), NotLoggedIn)
-
-    def test_logout(self):
-        self.fail()
 
     def test_sites_joined(self):
         sakai.sites_joined()
@@ -28,10 +25,14 @@ class TestSakai(TestCase):
         sakai.get_sites_list()
 
     def test_site_tools_list(self):
-        self.fail()
+        site = sakai.sites_joined()[1]
+        self.assertIsNotNone(sakai.site_tools_list(site['id']))
 
     def test_site_assignment_list(self):
-        self.fail()
+        site: Site = sakai.get_sites_list()[1]
+        self.assertIsNotNone(site.assignment_list())
 
     def test_site_resources_list(self):
-        self.fail()
+        site: Site = sakai.get_sites_list()[1]
+        self.assertIsNotNone(site.resources_list())
+ 
