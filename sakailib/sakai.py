@@ -19,7 +19,7 @@ class Sakai:
         self.session = requests.session()
         self.__jsessionid = jsessionid
         self.session.headers = {
-            'Host': 'sakai.sustc.edu.cn',
+            'Host': 'sakai.sustech.edu.cn',
             'Connection': 'keep-alive',
             'Cache-Control': 'max-age=0',
             'Upgrade-Insecure-Requests': '1',
@@ -49,14 +49,14 @@ class Sakai:
         logout the server
         :return:
         """
-        self.session.get('http://sakai.sustc.edu.cn/portal/pda/?force.logout=yes')
+        self.session.get('http://sakai.sustech.edu.cn/portal/pda/?force.logout=yes')
 
     def sites_joined(self):
         """
         get all joined sites
         :return: list of dict {id, name}
         """
-        resp = self.fetch('http://sakai.sustc.edu.cn/portal')
+        resp = self.fetch('http://sakai.sustech.edu.cn/portal')
         soup = BeautifulSoup(resp.content, 'html5lib')
         sites = list()
 
@@ -85,7 +85,7 @@ class Sakai:
         :param site_id:
         :return: list od dict {id, name}
         """
-        resp = self.fetch('http://sakai.sustc.edu.cn/portal/pda/' + site_id)
+        resp = self.fetch('http://sakai.sustech.edu.cn/portal/pda/' + site_id)
         soup = BeautifulSoup(resp.content, 'html5lib')
         tools = list()
         for li in soup.find('ul', {'id': 'pda-portlet-page-menu'}).find_all('li'):
@@ -102,7 +102,7 @@ class Sakai:
         :param tool_id: site's assignment tool's id
         :return: list of dict {title, status, start_date, due_date}
         """
-        resp = self.fetch('http://sakai.sustc.edu.cn/portal/pda/{}/tool/{}'.format(site_id, tool_id))
+        resp = self.fetch('http://sakai.sustech.edu.cn/portal/pda/{}/tool/{}'.format(site_id, tool_id))
         soup = BeautifulSoup(resp.content, 'html5lib')
         assignments = list()
         for tr in soup.find('table').find_all('tr')[1:]:
@@ -121,9 +121,9 @@ class Sakai:
         :param tool_id: site's resources tool's id
         :return: list of dict {name, path, url}
         """
-        resp = self.fetch('http://sakai.sustc.edu.cn/portal/pda/{}/tool/{}'.format(site_id, tool_id))
+        resp = self.fetch('http://sakai.sustech.edu.cn/portal/pda/{}/tool/{}'.format(site_id, tool_id))
         group_id = Site.match_file_group_id(resp.text)
-        base = 'http://sakai.sustc.edu.cn/access/content/group/{}/'.format(group_id)
+        base = 'http://sakai.sustech.edu.cn/access/content/group/{}/'.format(group_id)
 
         resp = self.fetch(base)
         file_list = list()

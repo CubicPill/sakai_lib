@@ -4,13 +4,13 @@ from bs4 import BeautifulSoup
 from sakailib.sakai import Sakai
 from .exceptions import SakaiException
 
-LOGIN_URL = 'http://sakai.sustc.edu.cn/portal/pda/?force.login=yes'
+LOGIN_URL = 'http://sakai.sustech.edu.cn/portal/pda/?force.login=yes'
 
 
 def cas_login(sid, password):
     session = requests.Session()
     session.headers = {
-        'Host': 'sakai.sustc.edu.cn',
+        'Host': 'sakai.sustech.edu.cn',
         'Connection': 'keep-alive',
         'Cache-Control': 'max-age=0',
         'Upgrade-Insecure-Requests': '1',
