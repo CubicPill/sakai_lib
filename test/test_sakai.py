@@ -10,11 +10,11 @@ sakai_nologin = Sakai('')
 
 class TestSakai(TestCase):
     def test_fetch(self):
-        sakai.fetch('http://sakai.sustc.edu.cn')
+        sakai.fetch('http://sakai.sustech.edu.cn')
 
     def test_fetch_no_login(self):
         try:
-            sakai_nologin.fetch('http://sakai.sustc.edu.cn')
+            sakai_nologin.fetch('http://sakai.sustech.edu.cn')
         except Exception as e:
             self.assertEqual(type(e), NotLoggedIn)
 

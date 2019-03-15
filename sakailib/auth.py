@@ -4,13 +4,13 @@ from bs4 import BeautifulSoup
 from sakailib.sakai import Sakai
 from .exceptions import SakaiException
 
-LOGIN_URL = 'http://sakai.sustc.edu.cn/portal/pda/?force.login=yes'
+LOGIN_URL = 'https://sakai.sustech.edu.cn/portal/login'
 
 
 def cas_login(sid, password):
     session = requests.Session()
     session.headers = {
-        'Host': 'sakai.sustc.edu.cn',
+        'Host': 'sakai.sustech.edu.cn',
         'Connection': 'keep-alive',
         'Cache-Control': 'max-age=0',
         'Upgrade-Insecure-Requests': '1',
@@ -36,8 +36,8 @@ def cas_login(sid, password):
 
     r = session.post(resp.url, data=info, timeout=30)
     soup_response = BeautifulSoup(r.content, 'html5lib')
-    err = soup_response.find('div', {'class': 'alert-danger'})
-    if err:
+    err = soup_response.find('span', {'class': 'all-sites-label'})
+    if not err:
         raise SakaiException('Login failed')
 
     return session.cookies.get('JSESSIONID', path='/')
